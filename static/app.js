@@ -11,6 +11,7 @@ const feedContainer = document.getElementById('feed-container');
 const searchInput = document.getElementById('search-input');
 const typeFilter = document.getElementById('type-filter');
 const errorMessage = document.getElementById('error-message');
+const exportCsvBtn = document.getElementById('export-csv-btn');
 
 // Tweet Workspace Elements
 const noSelectionState = document.getElementById('no-selection-state');
@@ -39,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     themeToggleBtn.addEventListener('click', toggleTheme);
     searchInput.addEventListener('input', applyFilters);
     typeFilter.addEventListener('change', applyFilters);
+    exportCsvBtn.addEventListener('click', exportToCSV);
     
     // Tweet Workspace Event Listeners
     tweetTextarea.addEventListener('input', updateTweetPreview);
@@ -177,7 +179,12 @@ function renderFeed(entries) {
             // HTML Body
             updateItem.innerHTML = `
                 <div class="update-header">
-                    <span class="badge ${badgeClass}">${update.type}</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="badge ${badgeClass}">${update.type}</span>
+                        <button class="copy-card-btn" title="Copy text to clipboard">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
                     <div class="select-check"><i class="fa-solid fa-check"></i></div>
                 </div>
                 <div class="update-body">${update.content}</div>
@@ -187,6 +194,13 @@ function renderFeed(entries) {
             if (selectedNote && selectedNote.id === updateId) {
                 updateItem.classList.add('selected');
             }
+
+            // Copy button listener
+            const copyBtn = updateItem.querySelector('.copy-card-btn');
+            copyBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                copyUpdateToClipboard(update, copyBtn);
+            });
 
             // Click listener
             updateItem.addEventListener('click', () => {
@@ -353,3 +367,82 @@ function shareOnTwitter() {
         `width=${width},height=${height},left=${left},top=${top},status=0,menubar=0,toolbar=0,location=0`
     );
 }
+
+// Copy single release note update text to clipboard
+async function copyUpdateToClipboard(update, btn) {
+    const plainText = stripHtml(update.content).trim();
+    const icon = btn.querySelector('i');
+    
+    try {
+        await navigator.clipboard.writeText(plainText);
+        
+        // Show success animation
+        btn.classList.add('copied');
+        icon.className = 'fa-solid fa-check';
+        btn.title = 'Copied!';
+        
+        setTimeout(() => {
+            btn.classList.remove('copied');
+            icon.className = 'fa-regular fa-copy';
+            btn.title = 'Copy text to clipboard';
+        }, 1500);
+    } catch (err) {
+        console.error('Clipboard copy failed: ', err);
+    }
+}
+
+// Export current loaded/filtered feed to CSV
+function exportToCSV() {
+    // Collect active rendered data. We can inspect the DOM or regenerate from filters.
+    const searchVal = searchInput.value.toLowerCase().trim();
+    const typeVal = typeFilter.value.toLowerCase();
+    
+    let csvRows = [];
+    
+    // Header
+    csvRows.push(['Date', 'Type', 'Google Link', 'Content (Plain Text)']);
+    
+    allReleaseNotes.forEach(dayEntry => {
+        dayEntry.sub_updates.forEach(update => {
+            const matchesType = typeVal === 'all' || update.type.toLowerCase().includes(typeVal);
+            const plainText = stripHtml(update.content).toLowerCase();
+            const matchesSearch = !searchVal || 
+                plainText.includes(searchVal) || 
+                update.type.toLowerCase().includes(searchVal) || 
+                dayEntry.date.toLowerCase().includes(searchVal);
+            
+            if (matchesType && matchesSearch) {
+                // Escaping fields for CSV format
+                const cleanDate = dayEntry.date.replace(/"/g, '""');
+                const cleanType = update.type.replace(/"/g, '""');
+                const cleanLink = dayEntry.link.replace(/"/g, '""');
+                const cleanContent = stripHtml(update.content).replace(/"/g, '""').trim();
+                
+                csvRows.push([
+                    `"${cleanDate}"`,
+                    `"${cleanType}"`,
+                    `"${cleanLink}"`,
+                    `"${cleanContent}"`
+                ]);
+            }
+        });
+    });
+
+    if (csvRows.length <= 1) {
+        alert('No data available to export with current filters.');
+        return;
+    }
+    
+    const csvContent = csvRows.map(row => row.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create link trigger
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `bigquery_release_notes_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
