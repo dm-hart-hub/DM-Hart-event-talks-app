@@ -28,18 +28,18 @@
                 </div>
             </div>
             <div class="header-actions">
-                <label class="switch-toggle" title="Toggle Dark/Light Theme">
+                <label class="switch-toggle" data-tooltip="Toggle Dark/Light Theme">
                     <input type="checkbox" id="theme-checkbox">
                     <span class="slider round">
                         <i class="fa-solid fa-moon icon-moon"></i>
                         <i class="fa-solid fa-sun icon-sun"></i>
                     </span>
                 </label>
-                <button id="export-csv-btn" class="btn btn-secondary" title="Export current feed to CSV">
+                <button id="export-csv-btn" class="btn btn-secondary" data-tooltip="Export current feed to CSV">
                     <i class="fa-solid fa-file-csv"></i>
                     <span>Export CSV</span>
                 </button>
-                <button id="refresh-btn" class="btn btn-primary">
+                <button id="refresh-btn" class="btn btn-primary" data-tooltip="Fetch latest release notes">
                     <i id="refresh-icon" class="fa-solid fa-rotate"></i>
                     <span>Refresh</span>
                 </button>
@@ -109,7 +109,7 @@
                         <div class="tweet-composer">
                             <div class="composer-header">
                                 <span class="composer-title">Draft Tweet</span>
-                                <button id="reset-tweet-btn" class="btn-text-danger" title="Clear selection">
+                                <button id="reset-tweet-btn" class="btn-text-danger" data-tooltip="Clear selection">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
                             </div>

@@ -181,11 +181,14 @@ function renderFeed(entries) {
                 <div class="update-header">
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span class="badge ${badgeClass}">${update.type}</span>
-                        <button class="copy-card-btn" title="Copy text to clipboard">
+                        <button class="copy-card-btn" data-tooltip="Copy to clipboard">
                             <i class="fa-regular fa-copy"></i>
                         </button>
                     </div>
-                    <div class="select-check"><i class="fa-solid fa-check"></i></div>
+                    <div style="display: flex; align-items: center;">
+                        <span class="hover-helper"><i class="fa-brands fa-x-twitter"></i> Click to draft</span>
+                        <div class="select-check"><i class="fa-solid fa-check"></i></div>
+                    </div>
                 </div>
                 <div class="update-body">${update.content}</div>
             `;
@@ -379,12 +382,12 @@ async function copyUpdateToClipboard(update, btn) {
         // Show success animation
         btn.classList.add('copied');
         icon.className = 'fa-solid fa-check';
-        btn.title = 'Copied!';
+        btn.setAttribute('data-tooltip', 'Copied!');
         
         setTimeout(() => {
             btn.classList.remove('copied');
             icon.className = 'fa-regular fa-copy';
-            btn.title = 'Copy text to clipboard';
+            btn.setAttribute('data-tooltip', 'Copy to clipboard');
         }, 1500);
     } catch (err) {
         console.error('Clipboard copy failed: ', err);
