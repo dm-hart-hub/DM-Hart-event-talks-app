@@ -219,6 +219,74 @@ body {
     background: var(--success-light);
 }
 
+/* Switch Toggle Container */
+.switch-toggle {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 32px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.switch-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    transition: var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+    border-radius: 34px;
+}
+.slider i {
+    font-size: 11px;
+    z-index: 1;
+    transition: var(--transition-normal);
+}
+.icon-moon {
+    color: var(--text-muted);
+}
+.icon-sun {
+    color: var(--text-muted);
+}
+body.light-theme .icon-sun {
+    color: var(--warning-color);
+}
+body.dark-theme .icon-moon {
+    color: #38bdf8; /* Soft blue moon in dark mode */
+}
+.slider::before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 3px;
+    bottom: 3px;
+    background-color: var(--text-primary);
+    transition: var(--transition-normal);
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 2;
+}
+.switch-toggle input:checked + .slider {
+    background-color: var(--primary-light);
+    border-color: var(--primary-color);
+}
+.switch-toggle input:checked + .slider::before {
+    transform: translateX(28px);
+    background-color: var(--primary-color);
+}
+
 .btn-icon {
     width: 42px;
     height: 42px;

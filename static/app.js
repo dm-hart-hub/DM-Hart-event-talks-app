@@ -4,7 +4,7 @@ let selectedNote = null;
 let currentTheme = 'dark';
 
 // DOM Elements
-const themeToggleBtn = document.getElementById('theme-toggle');
+const themeCheckbox = document.getElementById('theme-checkbox');
 const refreshBtn = document.getElementById('refresh-btn');
 const refreshIcon = document.getElementById('refresh-icon');
 const feedContainer = document.getElementById('feed-container');
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event Listeners
     refreshBtn.addEventListener('click', fetchData);
-    themeToggleBtn.addEventListener('click', toggleTheme);
+    themeCheckbox.addEventListener('change', toggleTheme);
     searchInput.addEventListener('input', applyFilters);
     typeFilter.addEventListener('change', applyFilters);
     exportCsvBtn.addEventListener('click', exportToCSV);
@@ -67,11 +67,11 @@ function setTheme(theme) {
     if (theme === 'light') {
         document.body.classList.add('light-theme');
         document.body.classList.remove('dark-theme');
-        themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+        themeCheckbox.checked = true;
     } else {
         document.body.classList.add('dark-theme');
         document.body.classList.remove('light-theme');
-        themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+        themeCheckbox.checked = false;
     }
 }
 
