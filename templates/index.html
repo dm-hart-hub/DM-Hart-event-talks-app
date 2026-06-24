@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BigQuery Release Hub & Tweeter</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="dark-theme">
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>BigQuery</h1>
+                    <span>Release Hub</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button id="theme-toggle" class="btn-icon" title="Toggle Theme">
+                    <i class="fa-solid fa-sun"></i>
+                </button>
+                <button id="refresh-btn" class="btn btn-primary">
+                    <i id="refresh-icon" class="fa-solid fa-rotate"></i>
+                    <span>Refresh</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Layout -->
+        <main class="app-main">
+            
+            <!-- Left Section: Release Notes Feed -->
+            <section class="feed-section">
+                <div class="section-header">
+                    <h2>Release Feed</h2>
+                    <div class="filters-bar">
+                        <div class="search-wrapper">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="search-input" placeholder="Search updates...">
+                        </div>
+                        <div class="select-wrapper">
+                            <select id="type-filter">
+                                <option value="all">All Types</option>
+                                <option value="feature">Features</option>
+                                <option value="deprecation">Deprecations</option>
+                                <option value="changed">Changes</option>
+                                <option value="resolved">Resolved</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="error-message" class="alert alert-error hidden">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span class="message-text">Failed to fetch release notes. Please try again.</span>
+                </div>
+
+                <div id="feed-container" class="feed-container">
+                    <!-- Shimmer / Skeleton Loaders -->
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+            </section>
+
+            <!-- Right Section: Tweet Workspace -->
+            <section class="tweet-section">
+                <div class="section-header">
+                    <h2>Tweet Workspace</h2>
+                </div>
+                
+                <div class="tweet-card-container">
+                    <div id="no-selection-state" class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fa-brands fa-x-twitter"></i>
+                        </div>
+                        <h3>No Update Selected</h3>
+                        <p>Select an update from the feed to compose and share a tweet about it.</p>
+                    </div>
+
+                    <div id="tweet-workspace-state" class="workspace-active hidden">
+                        <!-- Card Selection Info -->
+                        <div class="selected-meta">
+                            <span class="selected-date"><i class="fa-solid fa-calendar"></i> <span id="meta-date">June 23, 2026</span></span>
+                            <span class="badge" id="meta-badge">Feature</span>
+                        </div>
+
+                        <!-- Tweet Composition Box -->
+                        <div class="tweet-composer">
+                            <div class="composer-header">
+                                <span class="composer-title">Draft Tweet</span>
+                                <button id="reset-tweet-btn" class="btn-text-danger" title="Clear selection">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                            
+                            <textarea id="tweet-textarea" placeholder="What's happening?"></textarea>
+                            
+                            <!-- Helpers / Toggles -->
+                            <div class="composer-helpers">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="include-link-cb" checked>
+                                    <span>Include official link</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="include-hashtag-cb" checked>
+                                    <span>Add #BigQuery hashtag</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Live Twitter UI Preview -->
+                        <div class="twitter-preview">
+                            <div class="preview-header">
+                                <span class="preview-tag">X / Twitter Preview</span>
+                            </div>
+                            <div class="tweet-mockup">
+                                <div class="tweet-avatar">
+                                    <i class="fa-solid fa-user-astronaut"></i>
+                                </div>
+                                <div class="tweet-body">
+                                    <div class="tweet-user">
+                                        <span class="tweet-name">You</span>
+                                        <span class="tweet-handle">@username · Just now</span>
+                                    </div>
+                                    <div id="tweet-preview-text" class="tweet-content-text">
+                                        Select an update to preview...
+                                    </div>
+                                    <div class="tweet-actions-mock">
+                                        <span><i class="fa-regular fa-comment"></i> 0</span>
+                                        <span><i class="fa-regular fa-repost"></i> 0</span>
+                                        <span><i class="fa-regular fa-heart"></i> 0</span>
+                                        <span><i class="fa-regular fa-bookmark"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stats and Action -->
+                        <div class="workspace-footer">
+                            <div class="character-counter-wrapper">
+                                <div class="progress-ring-container">
+                                    <svg class="progress-ring" width="36" height="36">
+                                        <circle class="progress-ring__circle-bg" stroke="var(--border-color)" stroke-width="3" fill="transparent" r="14" cx="18" cy="18"/>
+                                        <circle id="progress-circle" class="progress-ring__circle" stroke="var(--primary-color)" stroke-width="3" fill="transparent" r="14" cx="18" cy="18"/>
+                                    </svg>
+                                    <span id="char-count">280</span>
+                                </div>
+                            </div>
+                            <button id="tweet-btn" class="btn btn-twitter">
+                                <i class="fa-brands fa-x-twitter"></i>
+                                <span>Tweet This</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
